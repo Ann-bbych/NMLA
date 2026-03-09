@@ -4,7 +4,7 @@ namespace GaussMethod
 {
     public static class GaussSolver
     {
-        public const double EPS = 1e-9;
+        public const double EPS = 1e-9; // 0.000000001
 
         public static double[,] Copy(double[,] matrix)
         {

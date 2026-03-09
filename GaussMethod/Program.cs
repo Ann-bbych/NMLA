@@ -9,11 +9,13 @@ namespace GaussMethod
     {
         static void Main(string[] args)
         {
-            const string inputFileName = "input.txt";
-            const string outputFileName = "output.txt";
+            string projectDirectory = Path.GetFullPath(
+            Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+
+            string inputFileName = Path.Combine(projectDirectory, "input.txt");
+            string outputFileName = Path.Combine(projectDirectory, "output.txt");
 
             using StreamWriter writer = new StreamWriter(outputFileName);
-
             try
             {
                 int size;
