@@ -5,6 +5,7 @@ namespace GaussMethod
         public const double EPS = 1e-9; // 0.000000001
         //для перевірки на близьку до виродженої матрицю
         //для форматованого виводу близького до цілого числа
+        //для обчислення похибки при перевірці розв'язку
         public static double[,] Copy(double[,] matrix)
         {
             // GetLength(dimension) - розмір виміру
