@@ -6,7 +6,8 @@ namespace LUmethod
 {
     public static class MatrixTools
     {
-        private const double eps = 1e-9;
+        // поріг точності для обчислень (похибка double)
+        private const double eps = 1e-9; // 0.000000001
 
         public static void ReadFromFile(string inputFileName, out double[,] a, out double[] b, out int n)
         {
@@ -39,22 +40,22 @@ namespace LUmethod
 
             for (int i = 0; i < n; i++)
             {
-                string line = lines[i + 1].Trim();
+                string line = lines[i + 1].Trim(); // беру рядок з елементами
 
                 if (line == "")
                 {
                     throw new Exception("Один із рядків матриці A порожній.");
                 }
-
+                // ділю його на елементи, додаю в parts
                 string[] parts = line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
-                if (parts.Length != n)
+                if (parts.Length != n) 
                 {
                     throw new Exception("Кількість елементів у рядку матриці A не дорівнює n.");
                 }
 
                 for (int j = 0; j < n; j++)
-                {
+                { // якщо вийшло, перетворюю елементи в double і записую в матрицю
                     if (!double.TryParse(parts[j], NumberStyles.Any, CultureInfo.InvariantCulture, out a[i, j]))
                     {
                         throw new Exception("Некоректне число у матриці A.");
@@ -86,13 +87,13 @@ namespace LUmethod
         }
 
         public static void WriteTo(StreamWriter writer, string text)
-        {
+        { // виводжу на консоль і  у файл 
             Console.Write(text);
             writer.Write(text);
         }
 
         public static void WriteLineTo(StreamWriter writer, string text)
-        {
+        { // виводжу на консоль і  у файл  + переходжу на новий рядок
             Console.WriteLine(text);
             writer.WriteLine(text);
         }
@@ -100,7 +101,7 @@ namespace LUmethod
         public static string FormatNumber(double value)
         { // десяткові - округлення до сотих, цілі - без крапки
             if (Math.Abs(value) < eps)
-            {
+            { //явний 0
                 value = 0.0;
             }
 
@@ -116,8 +117,10 @@ namespace LUmethod
 
         public static string FormatNumberExact(double value)
         { // для точного виводу елементів у обчисленні визначника
+            // але без проблеми з похибками double і з правильними цілими
+
             if (Math.Abs(value) < eps)
-            {
+            { // явний 0
                 value = 0.0;
             }
 
@@ -128,7 +131,7 @@ namespace LUmethod
                 return ((long)rounded).ToString(System.Globalization.CultureInfo.InvariantCulture);
             }
 
-            return value.ToString("G17", System.Globalization.CultureInfo.InvariantCulture);
+            return value.ToString("0.###############", CultureInfo.InvariantCulture);
         }
 
         public static void PrintMatrix(double[,] matrix, int n, StreamWriter writer)
@@ -228,24 +231,8 @@ namespace LUmethod
             return result;
         }
 
-        public static bool CheckLeadingMinors(double[,] a, int n)
-        {
-            for (int size = 1; size <= n; size++)
-            {
-                double[,] minor = BuildLeadingMinor(a, size);
-                double determinant = DeterminantByGauss(minor, size);
-
-                if (Math.Abs(determinant) < eps)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         public static double[,] BuildLeadingMinor(double[,] a, int size)
-        {
+        { // size змінний, починаємо з верхнього лівого фрагмента
             double[,] minor = new double[size, size];
 
             for (int i = 0; i < size; i++)

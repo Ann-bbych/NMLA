@@ -6,9 +6,8 @@ namespace LUmethod
     internal class Program
     {
         static void Main(string[] args)
-        {
-            string projectDirectory = Path.GetFullPath(
-                Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+        {   // правильно знайти і створити файли у папці проекту:
+            string projectDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
 
             string inputFileName = Path.Combine(projectDirectory, "input.txt");
             string outputFileName = Path.Combine(projectDirectory, "output.txt");
@@ -32,7 +31,7 @@ namespace LUmethod
                 MatrixTools.WriteLineTo(writer, "Вектор b:");
                 MatrixTools.PrintVector(b, n, writer);
 
-                bool canBuildLU = MatrixTools.CheckLeadingMinors(a, n);
+                bool canBuildLU = LUSolver.CheckLeadingMinors(a, n);
 
                 if (!canBuildLU)
                 {
@@ -61,16 +60,13 @@ namespace LUmethod
                 LUSolver.PrintSolutionProcess(y, x, n, writer);
 
                 MatrixTools.WriteLineTo(writer, "Визначник матриці:");
-
+                // вже разом із перевіркою і точним виводом чисел:
+                double determinant = LUSolver.FindDeterminant(u, n);
                 string detLine = "det(A) = ";
-                double determinant = 1.0;
 
                 for (int i = 0; i < n; i++)
                 {
-                    double value = u[i, i];
-                    determinant *= value;
-
-                    string part = MatrixTools.FormatNumberExact(value);
+                    string part = MatrixTools.FormatNumberExact(u[i, i]);
 
                     if (i == 0)
                     {
