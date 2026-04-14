@@ -44,8 +44,19 @@ namespace ThomasAlgorithm
             return rounded.ToString("0.00", CultureInfo.InvariantCulture);
         }
 
-        // форматований вивід похибок: 
-        // округлення до стільки знаків після коми, скільки потрібно для видимості похибки
+        // форматування чисел для 2-го режиму:
+        // без жорсткого округлення, з повною видимістю малих значень
+        public static string FormatNumberMode2(double value, double eps)
+        {
+            if (Math.Abs(value) < eps)
+            {
+                return "0";
+            }
+
+            return value.ToString("0.################", CultureInfo.InvariantCulture);
+        }
+
+        // форматований вивід похибок для 1-го режиму
         public static string FormatError(double value, double eps)
         {
             if (Math.Abs(value) < eps)
@@ -69,6 +80,7 @@ namespace ThomasAlgorithm
             return value.ToString("0.############", CultureInfo.InvariantCulture);
         }
 
+
         // виведення СЛАР у вигляді рівнянь
         public static void PrintSystem(TridiagonalSystem system, StreamWriter writer, string title, double eps)
         {
@@ -77,6 +89,20 @@ namespace ThomasAlgorithm
             for (int i = 0; i < system.N; i++)
             {
                 string equation = BuildEquation(system, i, eps);
+                WriteLineToBoth(equation, writer);
+            }
+
+            WriteLineToBoth(string.Empty, writer);
+        }
+
+        // виведення СЛАР у вигляді рівнянь для 2-го режиму
+        public static void PrintSystemMode2(TridiagonalSystem system, StreamWriter writer, string title, double eps)
+        {
+            WriteLineToBoth(title, writer);
+
+            for (int i = 0; i < system.N; i++)
+            {
+                string equation = BuildEquationMode2(system, i, eps);
                 WriteLineToBoth(equation, writer);
             }
 
@@ -94,6 +120,18 @@ namespace ThomasAlgorithm
 
             WriteLineToBoth(string.Empty, writer);
         }
+        // вивід розв'язку для 2-го режиму без жорсткого округлення
+        public static void PrintSolutionMode2(double[] solution, StreamWriter writer, string title, double eps)
+        {
+            WriteLineToBoth(title, writer);
+
+            for (int i = 0; i < solution.Length; i++)
+            {
+                WriteLineToBoth($"y{i} = {FormatNumberMode2(solution[i], eps)}", writer);
+            }
+
+            WriteLineToBoth(string.Empty, writer);
+        }
 
         // вивід перевірки необідних умов для лівої прогонки
         public static void PrintConditionsResult(string message, StreamWriter writer)
@@ -107,7 +145,7 @@ namespace ThomasAlgorithm
         public static void PrintBoundaryValueProblem(StreamWriter writer)
         {
             WriteLineToBoth("Крайова задача:", writer);
-            WriteLineToBoth("y` - y = 2 - x^2, 0 < x < 1", writer);
+            WriteLineToBoth("y'' - y = 2 - x^2, 0 < x < 1", writer);
             WriteLineToBoth("y(0) = 0", writer);
             WriteLineToBoth("y(1) = 1", writer);
             WriteLineToBoth(string.Empty, writer);
@@ -116,30 +154,16 @@ namespace ThomasAlgorithm
             WriteLineToBoth(string.Empty, writer);
         }
 
-        // вивід порівняння точного, чисельного розв'язків, похибки таблицею
-        public static void PrintExactAndNumericalSolutions(
-            double[] grid,
-            double[] exactValues,
-            double[] numericalValues,
-            double[] errors,
-            StreamWriter writer,
-            double eps)
+        // вивід похибки між точним і чисельним розв'язками
+        public static void PrintErrors(double[] exactValues, double[] numericalValues, double[] errors, StreamWriter writer, double eps)
         {
-            WriteLineToBoth("Точний і чисельний розв'язки:", writer);
-            WriteLineToBoth(
-                "i\t x_i\t\t y_точне\t y_чисельне\t похибка",
-                writer);
+            WriteLineToBoth("Похибка:", writer);
 
-            for (int i = 0; i < grid.Length; i++)
+            for (int i = 0; i < errors.Length; i++)
             {
-                string line =
-                    i.ToString(CultureInfo.InvariantCulture) + "\t " +
-                    FormatNumber(grid[i], eps) + "\t\t " +
-                    FormatNumber(exactValues[i], eps) + "\t\t " +
-                    FormatNumber(numericalValues[i], eps) + "\t\t " +
-                    FormatError(errors[i], eps);
-
-                WriteLineToBoth(line, writer);
+                WriteLineToBoth(
+                    $"|{FormatNumberMode2(exactValues[i], eps)} - {FormatNumberMode2(numericalValues[i], eps)}| = {FormatNumberMode2(errors[i], eps)}",
+                    writer);
             }
 
             WriteLineToBoth(string.Empty, writer);
@@ -199,5 +223,62 @@ namespace ThomasAlgorithm
 
             return builder.ToString();
         }
+
+        private static string BuildEquationMode2(TridiagonalSystem system, int row, double eps)
+        { // для виведення СЛАР рівняннями у 2-му режимі
+            StringBuilder builder = new StringBuilder();
+
+            if (row > 0 && Math.Abs(system.A[row]) >= eps)
+            {
+                builder.Append(FormatNumberMode2(system.A[row], eps));
+                builder.Append(" * y");
+                builder.Append(row - 1);
+            }
+
+            if (Math.Abs(system.C[row]) >= eps)
+            {
+                if (builder.Length > 0 && system.C[row] >= 0)
+                {
+                    builder.Append(" + ");
+                }
+                else if (builder.Length > 0 && system.C[row] < 0)
+                {
+                    builder.Append(" - ");
+                    builder.Append(FormatNumberMode2(Math.Abs(system.C[row]), eps));
+                    builder.Append(" * y");
+                    builder.Append(row);
+                    goto UpperPart;
+                }
+
+                builder.Append(FormatNumberMode2(system.C[row], eps));
+                builder.Append(" * y");
+                builder.Append(row);
+            }
+
+        UpperPart:
+            if (row < system.N - 1 && Math.Abs(system.B[row]) >= eps)
+            {
+                if (system.B[row] >= 0)
+                {
+                    builder.Append(" + ");
+                    builder.Append(FormatNumberMode2(system.B[row], eps));
+                }
+                else
+                {
+                    builder.Append(" - ");
+                    builder.Append(FormatNumberMode2(Math.Abs(system.B[row]), eps));
+                }
+
+                builder.Append(" * y");
+                builder.Append(row + 1);
+            }
+
+            builder.Append(" = ");
+            builder.Append(FormatNumberMode2(system.F[row], eps));
+
+            return builder.ToString();
+        }
     }
 }
+    
+

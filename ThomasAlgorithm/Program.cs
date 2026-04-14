@@ -76,18 +76,13 @@ namespace ThomasAlgorithm
 
         private static void RunMode2(StreamWriter writer)
         {
-            const int nodesCount = 6;
-
             Formatter.PrintBoundaryValueProblem(writer);
 
-            double[] grid = BoundaryValueProblem.BuildGrid(nodesCount);
-            TridiagonalSystem system = BoundaryValueProblem.BuildSystem(nodesCount, EPS);
+            TridiagonalSystem system = BoundaryValueProblem.BuildSystem(EPS);
+            Formatter.PrintSystemMode2(system, writer, "СЛАР для крайової задачі:", EPS);
 
-            Formatter.WriteLineToBoth($"Кількість вузлів сітки: {nodesCount}", writer);
-            Formatter.WriteLineToBoth($"Кількість внутрішніх вузлів (невідомих): {system.N}", writer);
-            Formatter.WriteLineToBoth(string.Empty, writer);
-
-            Formatter.PrintSystem(system, writer, "СЛАР, отримана методом сіток:", EPS);
+            double[] exactSolution = BoundaryValueProblem.GetExactSolutionVector();
+            Formatter.PrintSolutionMode2(exactSolution, writer, "Точний розв'язок СЛАР:", EPS);
 
             bool conditionsSatisfied = LeftSweepSolver.CheckNecessaryConditions(system, EPS, out string message);
             Formatter.PrintConditionsResult(message, writer);
@@ -97,19 +92,11 @@ namespace ThomasAlgorithm
                 return;
             }
 
-            double[] internalSolution = LeftSweepSolver.Solve(system, EPS);
-            double[] fullNumericalSolution = BoundaryValueProblem.BuildFullNumericalSolution(internalSolution);
-            double[] exactValues = BoundaryValueProblem.GetExactValues(grid);
-            double[] errors = BoundaryValueProblem.GetErrors(exactValues, fullNumericalSolution);
+            double[] numericalSolution = LeftSweepSolver.Solve(system, EPS);
+            double[] errors = BoundaryValueProblem.GetErrors(exactSolution, numericalSolution);
 
-            Formatter.PrintSolution(internalSolution, writer, "Розв'язок внутрішньої сіткової СЛАР:", EPS);
-            Formatter.PrintExactAndNumericalSolutions(
-                grid,
-                exactValues,
-                fullNumericalSolution,
-                errors,
-                writer,
-                EPS);
+            Formatter.PrintSolutionMode2(numericalSolution, writer, "Програмний розв'язок СЛАР:", EPS);
+            Formatter.PrintErrors(exactSolution, numericalSolution, errors, writer, EPS);
         }
     }
 }
