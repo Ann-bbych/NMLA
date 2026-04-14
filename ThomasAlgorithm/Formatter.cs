@@ -19,7 +19,7 @@ namespace ThomasAlgorithm
             writer.Write(text);
         }
 
-        // форматований вивід чисел:
+        // форматований вивід чисел (для режиму 1):
         // десяткові -> округлення до сотих
         // цілі -> без крапки
         public static string FormatNumber(double value, double eps)
@@ -44,7 +44,7 @@ namespace ThomasAlgorithm
             return rounded.ToString("0.00", CultureInfo.InvariantCulture);
         }
 
-        // форматування чисел для 2-го режиму:
+        // форматування чисел (для режиму 2) 
         // без жорсткого округлення, з повною видимістю малих значень
         public static string FormatNumberMode2(double value, double eps)
         {
@@ -56,7 +56,7 @@ namespace ThomasAlgorithm
             return value.ToString("0.################", CultureInfo.InvariantCulture);
         }
 
-        // форматований вивід похибок для 1-го режиму
+        // форматований вивід похибок (для режиму 1)
         public static string FormatError(double value, double eps)
         {
             if (Math.Abs(value) < eps)
@@ -81,7 +81,7 @@ namespace ThomasAlgorithm
         }
 
 
-        // виведення СЛАР у вигляді рівнянь
+        // виведення СЛАР у вигляді рівнянь (для режиму 1)
         public static void PrintSystem(TridiagonalSystem system, StreamWriter writer, string title, double eps)
         {
             WriteLineToBoth(title, writer);
@@ -95,7 +95,7 @@ namespace ThomasAlgorithm
             WriteLineToBoth(string.Empty, writer);
         }
 
-        // виведення СЛАР у вигляді рівнянь для 2-го режиму
+        // виведення СЛАР у вигляді рівнянь (для режиму 2)
         public static void PrintSystemMode2(TridiagonalSystem system, StreamWriter writer, string title, double eps)
         {
             WriteLineToBoth(title, writer);
@@ -120,7 +120,8 @@ namespace ThomasAlgorithm
 
             WriteLineToBoth(string.Empty, writer);
         }
-        // вивід розв'язку для 2-го режиму без жорсткого округлення
+
+        // вивід розв'язку (для режиму 2)
         public static void PrintSolutionMode2(double[] solution, StreamWriter writer, string title, double eps)
         {
             WriteLineToBoth(title, writer);

@@ -27,16 +27,16 @@ namespace ThomasAlgorithm
                 string message = "Помилка: неправильні розміри масивів.\n";
 
                 if (a.Length != n)
-                    message += $"Масив A має {a.Length}, очікується {n}.\n";
+                    message += $"Масив A має {a.Length}, а треба {n}.\n";
 
                 if (c.Length != n)
-                    message += $"Масив C має {c.Length}, очікується {n}.\n";
+                    message += $"Масив C має {c.Length}, а треба {n}.\n";
 
                 if (b.Length != n)
-                    message += $"Масив B має {b.Length}, очікується {n}.\n";
+                    message += $"Масив B має {b.Length}, а треба {n}.\n";
 
                 if (f.Length != n)
-                    message += $"Масив F має {f.Length}, очікується {n}.\n";
+                    message += $"Масив F має {f.Length}, а треба {n}.\n";
 
                 throw new ArgumentException(message);
             }
