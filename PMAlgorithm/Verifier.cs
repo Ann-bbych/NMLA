@@ -4,12 +4,13 @@ using System.IO;
 class Verifier
 {
     public static VerificationResult Verify(PMInputData data, PMResult result)
-    {
+    { // чи виконується Ax ≈ λx
         VerificationResult verification = new VerificationResult();
 
-        verification.Ax = Multiply(data.A, result.X);
-        verification.LambdaX = MultiplyByNumber(result.X, result.Lambda);
-        verification.ResidualNorm = FindResidualNorm(verification.Ax, verification.LambdaX);
+        verification.Ax = Multiply(data.A, result.X); // обчислюємо Ax
+        verification.LambdaX = MultiplyByNumber(result.X, result.Lambda); // обчислюємо λx
+        verification.ResidualNorm = FindResidualNorm(verification.Ax, verification.LambdaX); 
+        // обчислюємо ||Ax - λx|| - максимальну різницю між компонентами 
 
         return verification;
     }
@@ -61,7 +62,7 @@ class VerificationResult
     public void Print(StreamWriter writer, int digits)
     {
         Formatter.WriteLineTo("Перевірка правильності:", writer);
-        Formatter.WriteLineTo($"A * x = {Formatter.FormatCheckVector(Ax, digits)}", writer);
+        Formatter.WriteLineTo($"Ax = {Formatter.FormatCheckVector(Ax, digits)}", writer);
         Formatter.WriteLineTo($"λx = {Formatter.FormatCheckVector(LambdaX, digits)}", writer);
         Formatter.WriteLineTo($"||Ax - λx|| = {Formatter.FormatCheckNumber(ResidualNorm, digits)}", writer);
     }

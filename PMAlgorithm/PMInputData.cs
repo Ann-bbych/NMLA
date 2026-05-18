@@ -26,7 +26,7 @@ class PMInputData
             throw new Exception("Розмірність матриці має бути додатною.");
 
         if (lines.Length != n + 4)
-            throw new Exception("Некоректний формат файлу. Має бути: n, n рядків матриці, вектор, delta, epsilon.");
+            throw new Exception("Некоректний формат файлу. Має бути: n-розмірність, n рядків матриці, вектор, дельта, епсилон.");
 
         PMInputData data = new PMInputData();
         data.N = n;

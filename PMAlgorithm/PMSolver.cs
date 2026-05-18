@@ -15,18 +15,27 @@ class PMSolver
 
         while (true)
         {
-            double[] y = Multiply(data.A, x);
+            // ітерація:
+            double[] y = Multiply(data.A, x); // y^(k) = A * x^(k-1)
 
             double[] currentLambdas = FindLambdaComponents(x, y, data.Delta);
+            // будуємо S = { i : |x_i| >= δ } і обчислюємо λ_i = y_i / x_i для i ∈ S
+
             double[] lambdaDifferences = FindLambdaDifferences(currentLambdas, previousLambdas);
+            // обчислюємо Δλ_i = |λ_i - λ_i^(k-1)| для i ∈ S
 
             double lambdaAvg = FindLambdaAvg(currentLambdas);
-            double maxLambdaDifference = FindMaxValid(lambdaDifferences);
+            // обчислюємо середнє λ^(k) = (1 / |S|) * Σ λ_i для i ∈ S
 
-            double[] nextX = Normalise(y);
+            double maxLambdaDifference = FindMaxValid(lambdaDifferences);
+            // перевірка критерію зупинки: шукаємо найбільшу різниця λ (якщо вона ≤ ε, то інші точно ≤ ε)
+
+            double[] nextX = Normalise(y); //власний вектор наступної ітерації
+            // x^(k) = y^(k) / ||y^(k)||
 
             iteration++;
 
+            // зберігаємо перші ітерації для виводу
             if (iteration <= PMResult.maxPrintedIterations)
             {
                 result.FirstIterations.Add(new IterationInfo
@@ -42,6 +51,7 @@ class PMSolver
             x = nextX;
             previousLambdas = currentLambdas;
 
+            // перевірка критерію зупинки: порівнюємо максимальну різницю λ з ε
             if (maxLambdaDifference <= data.Epsilon)
             {
                 result.Lambda = lambdaAvg;
@@ -107,7 +117,7 @@ class PMSolver
     }
 
     private static double[] FindLambdaComponents(double[] previousX, double[] currentY, double delta)
-    {
+    { // визначає множину S і рахує покомпонентні λᵢ
         double[] lambdas = new double[previousX.Length];
         int count = 0;
 
@@ -131,7 +141,7 @@ class PMSolver
     }
 
     private static double[] FindLambdaDifferences(double[] currentLambdas, double[] previousLambdas)
-    {
+    { // рахує покомпонентні різниці Δλᵢ
         double[] differences = new double[currentLambdas.Length];
 
         for (int i = 0; i < currentLambdas.Length; i++)
@@ -146,7 +156,7 @@ class PMSolver
     }
 
     private static double FindLambdaAvg(double[] lambdas)
-    {
+    { // рахує середнє значення λ за допустимими компонентами
         double sum = 0;
         int count = 0;
 
@@ -166,7 +176,7 @@ class PMSolver
     }
 
     private static double FindMaxValid(double[] values)
-    {
+    { // шукає найбільшу різницю Δλ (якщо вона ≤ ε, то інші точно ≤ ε)
         bool found = false;
         double max = 0;
 
@@ -190,16 +200,16 @@ class PMSolver
 
 class PMResult
 {
-    public const int maxPrintedIterations = 10;
-    public const int maxIterations = 10000;
+    public const int maxPrintedIterations = 10; // кількість ітерацій які будуть виводитись
+    public const int maxIterations = 10000; // щоб не було нескінченного циклу
 
-    public double Lambda;
-    public double[] X = [];
-    public int Iterations;
-    public double[] LambdaDifferences = [];
-    public double MaxLambdaDifference;
+    public double Lambda; // власне значення
+    public double[] X = []; // власний вектор (нормований)
+    public int Iterations; // кількість ітерацій
+    public double[] LambdaDifferences = []; // масив покомпонентних різниць λ на останній ітерації
+    public double MaxLambdaDifference; // найбільша різниця λ на останній ітерації (для перевірки правильності)
 
-    public List<IterationInfo> FirstIterations = [];
+    public List<IterationInfo> FirstIterations = []; // масив інформації про перші ітерації 
 
     public void Print(StreamWriter writer, int digits)
     {
