@@ -1,4 +1,4 @@
-NMLA
+##NMLA
 Numerical Methods of Linear Algebra
 
 A collection of C# console applications developed during university coursework in numerical linear algebra. The projects cover solving linear systems, matrix factorization, and eigenvalue approximation, with algorithms implemented directly using arrays and the .NET standard library.
